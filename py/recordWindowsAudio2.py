@@ -1,4 +1,5 @@
 import pyaudio 
+import wave
 
 CHUNK = 1024
 FORMAT = pyaudio.paInt16
@@ -18,22 +19,16 @@ devices = []
 speaker_idx = None
 for i in range(0, device_count):
     device = p.get_device_info_by_host_api_device_index(0, i)
+    print(str(device))
     devices.append(device['name'])
-    if "Speakers (Realtek(R) Audio)" in device['name']:
+    if ("Stereo Mix" in device['name']) and ("Realtek(R) Audio" in device['name']):
         speaker_idx = device['index']
 
-for i in range(0, device_count):
-    print(str(p.get_device_info_by_host_api_device_index(0, i)))
-
-print(devices)
-print("Your speakers are device ", speaker_idx)
-
-p.get_device_info_by_host_api_device_index(0, speaker_idx)['hostApi']
-
 stream = p.open(format=FORMAT,
-                channels=0,
+                channels=2,
                 rate=RATE,
                 input=True,
+                input_device_index=speaker_idx,
                 frames_per_buffer=CHUNK)
 
 print("* recording")
